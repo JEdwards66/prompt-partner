@@ -26,7 +26,8 @@
     "test:ci": "react-scripts test --ci --passWithNoTests",
     "eject": "react-scripts eject",
     "cypress:open": "cypress open",
-    "cypress:run": "cypress run"
+    "cypress:run": "cypress run",
+    "serve": "serve -s build -l 3001"
   },
   "eslintConfig": {
     "extends": [
@@ -52,7 +53,8 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^14.4.3",
     "cypress": "^14.0.3",
-    "jest": "^27.5.1"
+    "jest": "^27.5.1",
+    "serve": "^14.2.4"
   },
   "jest": {
     "collectCoverageFrom": [

@@ -1,0 +1,70 @@
+name: Tests
+
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Use Node.js 18.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18.x
+        cache: 'npm'
+        cache-dependency-path: |
+          frontend/package-lock.json
+          backend/package-lock.json
+    
+    - name: Install Frontend Dependencies
+      working-directory: ./frontend
+      run: npm ci
+
+    - name: Install Backend Dependencies
+      working-directory: ./backend
+      run: npm ci
+    
+    - name: Frontend Unit Tests
+      working-directory: ./frontend
+      run: npm run test:ci
+
+    - name: Backend Unit Tests
+      working-directory: ./backend
+      run: npm run test:ci
+
+  integration-tests:
+    runs-on: ubuntu-latest
+    env:
+      REACT_APP_API_URL: http://localhost:5001
+      PORT: 3001
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Use Node.js 18.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18.x
+        cache: 'npm'
+        cache-dependency-path: |
+          frontend/package-lock.json
+          backend/package-lock.json
+
+    - name: Install Dependencies
+      run: cd frontend && npm ci && cd ../backend && npm ci
+    
+    - name: Build Frontend
+      working-directory: frontend
+      run: npm run build
+        
+    - name: Cypress Tests
+      uses: cypress-io/github-action@v6
+      with:
+        working-directory: frontend
+        spec: cypress/integration/promptWorkflows.spec.js
+        start: npm run serve & cd ../backend && npm run start:ci
+        wait-on: 'http://localhost:3001, http://localhost:5001/prompts'
+        wait-on-timeout: 120
+        command: npm run cypress:run 
